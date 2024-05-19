@@ -6,10 +6,10 @@ import sys
 from datetime import datetime
 
 
-def convert_usd_to_eur(usd_value, exchange_rate=0.85):
-    """Convert USD to EUR using a fixed exchange rate."""
+def convert_usd_to_eur(usd_value, rata_schimb=0.85):
+    """Schimba din dolari in euro folosind un curs valutor."""
     try:
-        return round(float(usd_value) * exchange_rate, 2)
+        return round(float(valoare_dolar) * rata_schimb, 2)
     except ValueError:
         return 0
 
@@ -21,29 +21,28 @@ def process_file(input_file, output_file):
         reader = csv.reader(infile, delimiter=';')
         writer = csv.writer(outfile)
 
-        # Write the header to the output file
+        
         writer.writerow(['Date', 'Commodity code', 'Commodity', 'Quantity KG', 'Quantity T', 'Value USD', 'Value EUR'])
 
-        next(reader)  # Skip the header row
+        next(reader)  
         for row in reader:
             if len(row) < 7:
-                continue  # Skip rows that do not have enough columns
+                continue  
 
-            year = row[0]
-            month = row[1]
+            an = row[0]
+            luna = row[1]
             commodity_code = row[2]
             commodity_description = row[3]
-            # Skipping 'Países' column since it is not required
-            value_usd = row[5]
+            valoare_dolar = row[5]
             quantity_kg = row[6]
 
-            # Format the date
+            # Aranjatul datei 
             try:
-                date = datetime(int(year), int(month), 1).strftime('%Y-%m')
+                date = datetime(int(an), int(luna), 1).strftime('%Y-%m')
             except ValueError:
-                continue  # Skip rows with invalid date
+                continue 
 
-            # Convert quantity from KG to T
+            # Transforma din kg in TONE 
             try:
                 quantity_kg = float(quantity_kg.replace(',', ''))
                 quantity_t = round(quantity_kg / 1000, 2)
@@ -51,8 +50,8 @@ def process_file(input_file, output_file):
                 quantity_kg = 0
                 quantity_t = 0
 
-            # Convert Value USD to Value EUR
-            value_eur = convert_usd_to_eur(value_usd)
+            # Transformare dolari in euro 
+            value_eur = convert_usd_to_eur(valoare_dolar)
 
             writer.writerow(
                 [date, commodity_code, commodity_description, quantity_kg, quantity_t, value_usd, value_eur])
