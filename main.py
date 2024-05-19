@@ -6,10 +6,10 @@ import sys
 from datetime import datetime
 
 
-def convert_usd_to_eur(usd_value, rata_schimb=0.85):
-    """Schimba din dolari in euro folosind un curs valutor."""
+def convert_usd_to_eur(usd_value, exchange_rate=0.85):
+    ""schimba dolari in euro."""
     try:
-        return round(float(valoare_dolar) * rata_schimb, 2)
+        return round(float(usd_value) * exchange_rate, 2)
     except ValueError:
         return 0
 
@@ -20,38 +20,31 @@ def process_file(input_file, output_file):
 
         reader = csv.reader(infile, delimiter=';')
         writer = csv.writer(outfile)
-
-        
-        writer.writerow(['Date', 'Commodity code', 'Commodity', 'Quantity KG', 'Quantity T', 'Value USD', 'Value EUR'])
-
-        next(reader)  
+        writer.writerow(['Date', 'Commodity code', 'Commodity', 'Quantity KG', 'Quantity T', 'Value USD', 'Value EUR']
+        next(reader) 
         for row in reader:
             if len(row) < 7:
                 continue  
-
-            an = row[0]
-            luna = row[1]
+            year = row[0]
+            month = row[1]
             commodity_code = row[2]
             commodity_description = row[3]
-            valoare_dolar = row[5]
+            value_usd = row[5]
             quantity_kg = row[6]
-
-            # Aranjatul datei 
+                
             try:
-                date = datetime(int(an), int(luna), 1).strftime('%Y-%m')
+                date = datetime(int(year), int(month), 1).strftime('%Y-%m')
             except ValueError:
                 continue 
-
-            # Transforma din kg in TONE 
+                
             try:
                 quantity_kg = float(quantity_kg.replace(',', ''))
                 quantity_t = round(quantity_kg / 1000, 2)
             except ValueError:
                 quantity_kg = 0
                 quantity_t = 0
-
-            # Transformare dolari in euro 
-            value_eur = convert_usd_to_eur(valoare_dolar)
+                
+            value_eur = convert_usd_to_eur(value_usd)
 
             writer.writerow(
                 [date, commodity_code, commodity_description, quantity_kg, quantity_t, value_usd, value_eur])
@@ -64,5 +57,3 @@ if __name__ == "__main__":
 
     input_file = sys.argv[1]
     output_file = sys.argv[2]
-
-    process_file(input_file, output_file)
